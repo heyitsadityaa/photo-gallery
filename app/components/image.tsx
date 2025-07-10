@@ -6,18 +6,32 @@ import { useQuery } from 'convex/react';
 import Image from 'next/image';
 import React, { useState } from 'react'
 import { IoImageOutline } from "react-icons/io5";
+import { FiTrash2 } from "react-icons/fi";
+import { useMutation } from 'convex/react';
+import { Id } from '@/convex/_generated/dataModel';
 
 const ImageComponent = () => {
     const getImages = useQuery(api.images.getImages);
     const [page, setPage] = useState(0);
     const [search, setSearch] = useState("");
     const imagesPerPage = 6;
+    const [deletingId, setDeletingId] = useState<string | null>(null);
+    const deleteImage = useMutation(api.images.deleteImage);
 
     // Filter images by search
     const filteredImages = getImages ? getImages.filter(img => img.name.toLowerCase().includes(search.toLowerCase())) : [];
     // Calculate paginated images
     const paginatedImages = filteredImages ? filteredImages.slice(page * imagesPerPage, (page + 1) * imagesPerPage) : [];
     const totalPages = filteredImages ? Math.ceil(filteredImages.length / imagesPerPage) : 0;
+
+    const handleDelete = async (id: string, storageId: string) => {
+        setDeletingId(id);
+        try {
+            await deleteImage({ id: id as Id<'images'>, storageId: storageId as Id<'_storage'> });
+        } finally {
+            setDeletingId(null);
+        }
+    };
 
     // Loading state
     if (getImages === undefined) {
@@ -39,7 +53,7 @@ const ImageComponent = () => {
                 <div className="flex justify-center py-4 px-4 sm:px-6 md:px-8">
                     <input
                         type="text"
-                        placeholder="Search images..."
+                        placeholder="Search images"
                         value={search}
                         onChange={e => {
                             setSearch(e.target.value);
@@ -60,7 +74,7 @@ const ImageComponent = () => {
             <div className="flex justify-center py-4 px-4 sm:px-6 md:px-8">
                 <input
                     type="text"
-                    placeholder="Search images..."
+                    placeholder="Search images"
                     value={search}
                     onChange={e => {
                         setSearch(e.target.value);
@@ -71,7 +85,7 @@ const ImageComponent = () => {
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 sm:gap-8 px-4 sm:px-6 md:px-8">
                 {paginatedImages.map((image) => (
-                    <div key={image._id} className="border border-border rounded-md p-2 flex flex-col items-center bg-background">
+                    <div key={image._id} className="border border-border rounded-md p-2 flex flex-col items-center bg-background relative group">
                         <Image
                             src={image.url!}
                             alt={image.name}
@@ -79,6 +93,18 @@ const ImageComponent = () => {
                             height={350}
                             className="rounded-md border border-border"
                         />
+                        <button
+                            className="absolute top-2 right-2 p-2 m-2 rounded-full bg-background border border-border text-red-500 opacity-0 group-hover:opacity-100 transition-opacity disabled:opacity-50"
+                            onClick={() => handleDelete(image._id, image.body)}
+                            disabled={deletingId === image._id}
+                            title="Delete image"
+                        >
+                            {deletingId === image._id ? (
+                                <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" /></svg>
+                            ) : (
+                                <FiTrash2 className="h-5 w-5" />
+                            )}
+                        </button>
                         <div className="mt-2 text-center text-sm text-foreground break-all w-full">
                             {image.name}
                         </div>

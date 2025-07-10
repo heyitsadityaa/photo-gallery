@@ -37,3 +37,12 @@ export const getImages = query({
         })))
     }
 })
+
+// Delete image mutation
+export const deleteImage = mutation({
+    args: { id: v.id("images"), storageId: v.id("_storage") },
+    async handler(ctx, args) {
+        await ctx.db.delete(args.id);
+        await ctx.storage.delete(args.storageId);
+    }
+});
