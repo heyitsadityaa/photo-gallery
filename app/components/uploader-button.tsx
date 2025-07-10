@@ -1,11 +1,12 @@
 'use client'
 
 import { Dialog, DialogContent, DialogTrigger, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
-import { useMutation, useQuery } from "convex/react";
+import { api } from "@/convex/_generated/api";
+import { useMutation } from "convex/react";
 import { useEffect, useState } from "react";
 import { useDropzone } from "react-dropzone";
+import { toast } from "sonner";
 
 const UploadButton = () => {
     const [open, setOpen] = useState(false);
@@ -29,39 +30,48 @@ const UploadButton = () => {
     const addImage = useMutation(api.images.addImage);
 
     const handleAddImage = async () => {
+        try {
+            setIsUploading(true);
+            const uploadUrl = await generateUploadUrl();
 
-        const uploadUrl = await generateUploadUrl();
+            const result = await fetch(uploadUrl, {
+                method: "POST",
+                headers: { "Content-Type": selectedImage!.type },
+                body: selectedImage,
+            });
 
-        const result = await fetch(uploadUrl, {
-            method: "POST",
-            headers: { "Content-Type": selectedImage!.type },
-            body: selectedImage,
-        });
+            const json = await result.json();
+            if (!result.ok) {
+                throw new Error(`Upload failed: ${JSON.stringify(json)}`);
+            }
+            const { storageId } = json;
 
-        const json = await result.json();
-        if (!result.ok) {
-            throw new Error(`Upload failed: ${JSON.stringify(json)}`);
+            // Validate storageId
+            if (!storageId || storageId === "") {
+                throw new Error("Upload failed: No storage ID returned");
+            }
+
+            await addImage({
+                name: selectedImage!.name,
+                storageId: storageId as Id<"_storage">
+            });
+            toast.success("Uploaded successfully");
+            setSelectedImage(null);
+            setOpen(false);
+        } catch (error) {
+            toast.error("Upload failed");
+        } finally {
+            setIsUploading(false);
         }
-        const { storageId } = json;
 
-        // Validate storageId
-        if (!storageId || storageId === "") {
-            throw new Error("Upload failed: No storage ID returned");
-        }
 
-        await addImage({
-            name: selectedImage!.name,
-            storageId: storageId as Id<"_storage">
-        });
-        setSelectedImage(null);
-        setOpen(false);
     }
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
                 <button
-                    className="bg-lime-600 text-white px-4 py-2 rounded hover:bg-lime-700 transition-colors"
+                    className="bg-lime-500 text-white px-4 py-2 rounded hover:bg-lime-600 transition-colors"
                     type="button"
                 >
                     Add Image
@@ -73,7 +83,7 @@ const UploadButton = () => {
                 {acceptedFiles.length === 0 && (
                     <div
                         {...getRootProps()}
-                        className={`flex flex-col items-center justify-center border-2 border-dashed rounded-xl p-10 mt-4 mb-2 text-center cursor-pointer transition-colors bg-gray-50 dark:bg-gray-800 hover:bg-lime-50 dark:hover:bg-lime-900 ${isDragActive ? 'border-lime-500 bg-lime-100 dark:bg-lime-950' : 'border-gray-300'}`}
+                        className={`flex flex-col items-center justify-center border-2 border-dashed rounded-xl p-10 mt-4 mb-2 text-center cursor-pointer transition-colors bg-background hover:bg-lime-50 dark:hover:bg-lime-900/20 ${isDragActive ? 'border-lime-500 bg-lime-100 dark:bg-lime-950' : 'border-gray-300'}`}
                     >
                         <input {...getInputProps()} />
                         <svg
@@ -119,7 +129,7 @@ const UploadButton = () => {
                         {/* Upload button outside the dropzone */}
                         <div className="flex justify-center mt-4">
                             <button
-                                className="bg-lime-600 text-white px-4 py-2 rounded hover:bg-lime-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="bg-lime-500 text-white px-4 py-2 rounded hover:bg-lime-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                                 onClick={handleAddImage}
                                 disabled={isUploading}
                             >
