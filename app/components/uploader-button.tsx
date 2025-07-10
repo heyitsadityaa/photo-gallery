@@ -7,6 +7,7 @@ import { useMutation } from "convex/react";
 import { useEffect, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { toast } from "sonner";
+import { FaSpinner } from "react-icons/fa";
 
 const UploadButton = () => {
     const [open, setOpen] = useState(false);
@@ -129,10 +130,13 @@ const UploadButton = () => {
                         {/* Upload button outside the dropzone */}
                         <div className="flex justify-center mt-4">
                             <button
-                                className="bg-lime-500 text-white px-4 py-2 rounded hover:bg-lime-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="bg-lime-500 text-white px-4 py-2 rounded hover:bg-lime-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                                 onClick={handleAddImage}
                                 disabled={isUploading}
                             >
+                                {isUploading && (
+                                    <FaSpinner className="animate-spin" />
+                                )}
                                 Upload
                             </button>
                         </div>
