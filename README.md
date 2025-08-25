@@ -10,7 +10,7 @@
 
 ## Demo
 
-![Photo Gallery Demo](https://github.com/user-attachments/assets/30ff4d26-48ea-4616-927e-c1751f919f53)
+[Photo Gallery Demo](https://github.com/user-attachments/assets/30ff4d26-48ea-4616-927e-c1751f919f53)
 
 
 ## 📋 Description
