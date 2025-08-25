@@ -1,8 +1,15 @@
+const deployment = process.env.CONVEX_DEPLOYMENT;
+const hostname = deployment ? `${deployment}.convex.cloud` : '';
+
 module.exports = {
   images: {
     remotePatterns: [
-      new URL('https://befitting-raven-113.convex.cloud/api/**')]
-
+      {
+        protocol: 'https',
+        hostname,
+        pathname: '/api/**',
+      },
+    ],
   },
   /* config options here */
 };

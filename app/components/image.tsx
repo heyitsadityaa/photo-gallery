@@ -9,6 +9,7 @@ import { IoImageOutline } from "react-icons/io5";
 import { FiTrash2 } from "react-icons/fi";
 import { useMutation } from 'convex/react';
 import { Id } from '@/convex/_generated/dataModel';
+import { toast } from 'sonner';
 
 const ImageComponent = () => {
     const getImages = useQuery(api.images.getImages);
@@ -28,6 +29,10 @@ const ImageComponent = () => {
         setDeletingId(id);
         try {
             await deleteImage({ id: id as Id<'images'>, storageId: storageId as Id<'_storage'> });
+            toast.success("Image deleted successfully!");
+        } catch (error) {
+            toast.error("Failed to delete image. Please try again.");
+            console.log("error", error);
         } finally {
             setDeletingId(null);
         }
@@ -87,6 +92,7 @@ const ImageComponent = () => {
                 {paginatedImages.map((image) => (
                     <div key={image._id} className="border border-border rounded-md p-2 flex flex-col items-center bg-background relative group">
                         <Image
+                            priority
                             src={image.url!}
                             alt={image.name}
                             width={350}

@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { toast } from "sonner";
 import { FaSpinner } from "react-icons/fa";
+import Image from "next/image";
 
 const UploadButton = () => {
     const [open, setOpen] = useState(false);
@@ -61,6 +62,8 @@ const UploadButton = () => {
             setOpen(false);
         } catch (error) {
             toast.error("Upload failed");
+            console.log("error", error);
+
         } finally {
             setIsUploading(false);
         }
@@ -112,7 +115,7 @@ const UploadButton = () => {
                             className={`flex flex-col items-center gap-2 border-2 border-dashed rounded-xl transition-colors w-full cursor-pointer ${isDragActive ? 'border-lime-500 bg-lime-100 dark:bg-lime-950' : 'border-transparent'}`}
                         >
                             <input {...getInputProps()} />
-                            <img
+                            <Image
                                 src={URL.createObjectURL(acceptedFiles[0])}
                                 alt={acceptedFiles[0].name}
                                 className="w-20 h-20 object-cover rounded border mb-2"
