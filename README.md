@@ -1,5 +1,7 @@
 # 📸 Photo Gallery
 
+<div align="center">
+
 [![Next.js](https://img.shields.io/badge/Next.js-14-black?logo=next.js)](https://nextjs.org/)
 [![Convex](https://img.shields.io/badge/Convex-Backend-orange)](https://convex.dev/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5-blue?logo=typescript)](https://www.typescriptlang.org/)
@@ -7,6 +9,8 @@
 [![Vercel](https://img.shields.io/badge/Vercel-Deployment-000000?logo=vercel)](https://vercel.com/)
 [![React Hook Form](https://img.shields.io/badge/React_Hook_Form-Forms-EC5990?logo=reacthookform)](https://react-hook-form.com/)
 [![React Dropzone](https://img.shields.io/badge/React_Dropzone-Upload-61DAFB?logo=react)](https://react-dropzone.js.org/)
+
+</div>
 
 ## Demo
 
